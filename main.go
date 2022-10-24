@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	SymbolList   []Symbol = []Symbol{{Kind: "indices", Name: "nq-100-futures"}}
+	SymbolList   []Symbol = []Symbol{{Kind: "indices", Name: "nq-100-futures", DisplayName: "NASDAQ100"}}
 	GlobalLogger *logrus.Logger
 )
 

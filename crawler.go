@@ -18,8 +18,9 @@ var (
 type (
 	// symbol definition for investing.com requesting
 	Symbol struct {
-		Kind string `json:"kind"`
-		Name string `json:"name"`
+		Kind        string `json:"kind"`
+		Name        string `json:"name"`
+		DisplayName string `json:"display_name"`
 	}
 
 	// Symbol for publishing to MQTT
@@ -86,7 +87,7 @@ func GetPriceBySymbol(symbol Symbol) (SymbolTopic, error) {
 		// look hangang view firmware's json comment for diving by 100
 		res.Price = int(float32(price.Price) * 100)
 		res.Percentile = int(float32(price.Percentile) * 100)
-		res.Name = symbol.Name
+		res.Name = symbol.DisplayName
 	}
 	return res, err
 }
