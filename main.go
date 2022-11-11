@@ -17,14 +17,15 @@ import (
 )
 
 var (
-	SymbolList   []Symbol = []Symbol{{Kind: "indices", Name: "nq-100-futures", DisplayName: "NASDAQ100"}}
+	// example: {Kind: "indices", Name: "nq-100-futures", DisplayName: "NASDAQ100"}
+	SymbolList   []Symbol = []Symbol{}
 	GlobalLogger *logrus.Logger
 )
 
 func main() {
 	var (
 		port                int
-		id                  string
+		id, topicPath       string
 		symbolPublishBridge chan SymbolTopic = make(chan SymbolTopic, 100)
 	)
 
@@ -36,13 +37,26 @@ func main() {
 	GlobalLogger.SetLevel(logrus.DebugLevel)
 
 	flag.StringVar(&id, "id", "chinchister", "mqtt broker id")
-	flag.IntVar(&port, "port", 1888, "mqtt listening port")
+	flag.IntVar(&port, "port", 3000, "mqtt listening port")
+	flag.StringVar(&topicPath, "topic", "topic.json", "symbol topic definition file path")
 	flag.Parse()
+
+	topicFile, err := os.ReadFile(topicPath)
+	if err != nil {
+		GlobalLogger.WithError(err).Panic("failed to read topic file on %s", topicPath)
+		return
+	}
+	err = json.Unmarshal(topicFile, &SymbolList)
+	if err != nil {
+		GlobalLogger.WithError(err).Panic("failed to parse topic file")
+		return
+	}
+	GlobalLogger.Infof("%d symbols parse from file", len(SymbolList))
 
 	GlobalLogger.Infof("start MQTT server at port %d, id %s", port, id)
 	mqttServer := mqtt.NewServer(nil)
 	mqttListner := listeners.NewTCP(id, fmt.Sprintf(":%d", port))
-	err := mqttServer.AddListener(mqttListner, &listeners.Config{
+	err = mqttServer.AddListener(mqttListner, &listeners.Config{
 		Auth: new(auth.Allow),
 	})
 	if err != nil {

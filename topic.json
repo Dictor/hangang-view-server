@@ -1,0 +1,8 @@
+[
+    {"kind": "indices", "name": "nq-100-futures", "display_name": "NASDAQ100"},
+    {"kind": "indices", "name": "kospi", "display_name": "KOSPI"},
+    {"kind": "indices", "name": "us-spx-500-futures", "display_name": "S&P 500"},
+    {"kind": "equities", "name": "samsung-electronics-co-ltd", "display_name": "Samsung Electronics"},
+    {"kind": "equities", "name": "intel-corp", "display_name": "Intel"},
+    {"kind": "commodities", "name": "crude-oil", "display_name": "WTI Future"}
+]
