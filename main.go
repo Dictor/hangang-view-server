@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"sort"
 	"syscall"
 	"time"
 
@@ -121,6 +122,10 @@ func PublishSymbolTask(server *mqtt.Server, symbolChan <-chan SymbolTopic) {
 			for _, v := range results {
 				resultToList = append(resultToList, v)
 			}
+
+			sort.Slice(resultToList, func(i, j int) bool {
+				return resultToList[i].Name < resultToList[j].Name
+			})
 
 			if payload, err = json.Marshal(&resultToList); err != nil {
 				GlobalLogger.WithError(err).Error("fail to marshar symbol results")
