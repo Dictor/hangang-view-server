@@ -5,14 +5,10 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/chromedp/chromedp"
 	"github.com/sirupsen/logrus"
-)
-
-var (
-	globalChromeContext context.Context
-	globalChromeCancler context.CancelFunc
 )
 
 type (
@@ -37,7 +33,6 @@ type (
 )
 
 func InitChrome() {
-	globalChromeContext, globalChromeCancler = chromedp.NewContext(context.Background())
 }
 
 func GetPrice(symbolKind string, symbolName string) (Price, error) {
@@ -54,21 +49,28 @@ func GetPrice(symbolKind string, symbolName string) (Price, error) {
 		}
 	)
 
+	parentCtx, _ := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, _ := chromedp.NewContext(parentCtx)
+
 	url := fmt.Sprintf("https://kr.investing.com/%s/%s", symbolKind, symbolName)
-	err = chromedp.Run(globalChromeContext,
+	err = chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.Text(`[data-test="instrument-price-last"]`, &price, chromedp.NodeVisible),
 		chromedp.Text(`[data-test="instrument-price-change-percent"]`, &percentile, chromedp.NodeVisible))
+	if err != nil {
+		GlobalLogger.WithError(err).Error("fail to crawl information")
+		return result, err
+	}
 
 	price = sanitize(price)
 	percentile = sanitize(percentile)
 
 	if result.Price, err = strconv.ParseFloat(price, 64); err != nil {
-		GlobalLogger.WithError(err).Error("fail to parse price string")
+		GlobalLogger.WithError(err).WithField("input", price).Error("fail to parse price string")
 		return result, err
 	}
 	if result.Percentile, err = strconv.ParseFloat(percentile, 64); err != nil {
-		GlobalLogger.WithError(err).Error("fail to parse percentile string")
+		GlobalLogger.WithError(err).WithField("input", percentile).Error("fail to parse percentile string")
 		return result, err
 	}
 

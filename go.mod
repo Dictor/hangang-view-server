@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/mochi-co/mqtt v1.3.2
 	github.com/namsral/flag v1.7.4-pre
+	golang.org/x/net v0.2.0
 )
 
 require (
@@ -23,5 +24,5 @@ require (
 require (
 	github.com/chromedp/chromedp v0.8.6
 	github.com/sirupsen/logrus v1.9.0
-	golang.org/x/sys v0.0.0-20221006211917-84dc82d7e875 // indirect
+	golang.org/x/sys v0.2.0 // indirect
 )
